@@ -329,6 +329,17 @@ class BarcodeReader:
 
         tmp_dir = Path(tempfile.mkdtemp(prefix="paperless-barcode-split-")).resolve()
 
+        # sub_dirs = actual path - CONSUMPTION_DIR
+        # e.g. /src/consume/foo/bar - /src/consume => /foo/bar
+        consumption_sub_dirs = str(self.file.parent.absolute()).replace(str(settings.CONSUMPTION_DIR),"")
+        #logger.debug(f"consumption_sub_dirs: {consumption_sub_dirs} ({self.file.parent.absolute()})")
+        if consumption_sub_dirs != "":
+            tmp_dir = Path(str(tmp_dir) + consumption_sub_dirs)
+            # ensure existence of new tmp_dir
+            import os
+            os.makedirs(tmp_dir, exist_ok=True)
+            #logger.info(f"Consumption directory aware tmp_dir: {tmp_dir}")
+
         from documents import tasks
 
         # Create the split document tasks
